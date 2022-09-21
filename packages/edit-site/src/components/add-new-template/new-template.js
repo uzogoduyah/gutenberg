@@ -41,8 +41,10 @@ import {
 	useTaxonomiesMenuItems,
 	usePostTypeMenuItems,
 	useAuthorMenuItem,
+	usePostTypeArchiveMenuItems,
 } from './utils';
 import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
+import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { useHistory } from '../routes';
 import { store as editSiteStore } from '../../store';
 
@@ -85,6 +87,7 @@ export default function NewTemplate( { postType } ) {
 		setShowCustomGenericTemplateModal,
 	] = useState( false );
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
+	const [ isCreatingTemplate, setIsCreatingTemplate ] = useState( false );
 
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -93,6 +96,10 @@ export default function NewTemplate( { postType } ) {
 	const { setTemplate } = useDispatch( editSiteStore );
 
 	async function createTemplate( template, isWPSuggestion = true ) {
+		if ( isCreatingTemplate ) {
+			return;
+		}
+		setIsCreatingTemplate( true );
 		try {
 			const { title, description, slug, templatePrefix } = template;
 			let templateContent = template.content;
@@ -105,7 +112,7 @@ export default function NewTemplate( { postType } ) {
 						template_prefix: templatePrefix,
 					} ),
 				} );
-				templateContent = fallbackTemplate.content;
+				templateContent = fallbackTemplate.content.raw;
 			}
 			const newTemplate = await saveEntityRecord(
 				'postType',
@@ -150,6 +157,8 @@ export default function NewTemplate( { postType } ) {
 			createErrorNotice( errorMessage, {
 				type: 'snackbar',
 			} );
+		} finally {
+			setIsCreatingTemplate( false );
 		}
 	}
 
@@ -175,53 +184,60 @@ export default function NewTemplate( { postType } ) {
 				} }
 			>
 				{ () => (
-					<NavigableMenu className="edit-site-new-template-dropdown__popover">
-						<MenuGroup label={ postType.labels.add_new_item }>
-							{ missingTemplates.map( ( template ) => {
-								const {
-									title,
-									description,
-									slug,
-									onClick,
-									icon,
-								} = template;
-								return (
-									<MenuItem
-										icon={
-											icon ||
-											TEMPLATE_ICONS[ slug ] ||
-											post
-										}
-										iconPosition="left"
-										info={ description }
-										key={ slug }
-										onClick={ () =>
-											onClick
-												? onClick( template )
-												: createTemplate( template )
-										}
-									>
-										{ title }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-						<MenuGroup>
-							<MenuItem
-								icon={ customGenericTemplateIcon }
-								iconPosition="left"
-								info={ __(
-									'Custom templates can be applied to any post or page.'
-								) }
-								key="custom-template"
-								onClick={ () =>
-									setShowCustomGenericTemplateModal( true )
-								}
-							>
-								{ __( 'Custom template' ) }
-							</MenuItem>
-						</MenuGroup>
-					</NavigableMenu>
+					<>
+						{ isCreatingTemplate && (
+							<TemplateActionsLoadingScreen />
+						) }
+						<NavigableMenu className="edit-site-new-template-dropdown__popover">
+							<MenuGroup label={ postType.labels.add_new_item }>
+								{ missingTemplates.map( ( template ) => {
+									const {
+										title,
+										description,
+										slug,
+										onClick,
+										icon,
+									} = template;
+									return (
+										<MenuItem
+											icon={
+												icon ||
+												TEMPLATE_ICONS[ slug ] ||
+												post
+											}
+											iconPosition="left"
+											info={ description }
+											key={ slug }
+											onClick={ () =>
+												onClick
+													? onClick( template )
+													: createTemplate( template )
+											}
+										>
+											{ title }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+							<MenuGroup>
+								<MenuItem
+									icon={ customGenericTemplateIcon }
+									iconPosition="left"
+									info={ __(
+										'Custom templates can be applied to any post or page.'
+									) }
+									key="custom-template"
+									onClick={ () =>
+										setShowCustomGenericTemplateModal(
+											true
+										)
+									}
+								>
+									{ __( 'Custom template' ) }
+								</MenuItem>
+							</MenuGroup>
+						</NavigableMenu>
+					</>
 				) }
 			</DropdownMenu>
 			{ showCustomTemplateModal && (
@@ -229,12 +245,14 @@ export default function NewTemplate( { postType } ) {
 					onClose={ () => setShowCustomTemplateModal( false ) }
 					onSelect={ createTemplate }
 					entityForSuggestions={ entityForSuggestions }
+					isCreatingTemplate={ isCreatingTemplate }
 				/>
 			) }
 			{ showCustomGenericTemplateModal && (
 				<AddCustomGenericTemplateModal
 					onClose={ () => setShowCustomGenericTemplateModal( false ) }
 					createTemplate={ createTemplate }
+					isCreatingTemplate={ isCreatingTemplate }
 				/>
 			) }
 		</>
@@ -301,6 +319,7 @@ function useMissingTemplates(
 	} );
 	const missingTemplates = [
 		...enhancedMissingDefaultTemplateTypes,
+		...usePostTypeArchiveMenuItems(),
 		...postTypesMenuItems,
 		...taxonomiesMenuItems,
 	];
