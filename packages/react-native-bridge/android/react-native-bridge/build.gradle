@@ -90,7 +90,7 @@ dependencies {
         exclude group: 'com.github.wordpress-mobile', module: 'react-native-reanimated'
     })
 
-    runtimeOnly("com.facebook.react:hermes-engine:$rnVersion", {
+    implementation("com.facebook.react:hermes-engine:$rnVersion", {
         exclude group:'com.facebook.fbjni'
     })
 
