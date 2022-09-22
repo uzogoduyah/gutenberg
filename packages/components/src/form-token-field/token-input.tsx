@@ -7,7 +7,7 @@ import type { ChangeEvent, ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useEffect, useState } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,26 +22,15 @@ export function UnForwardedTokenInput(
 	const {
 		value,
 		isExpanded,
-		inputHasFocus = false,
 		instanceId,
 		selectedSuggestionIndex,
 		className,
 		onChange,
+		isComboboxControl,
 		...restProps
 	} = props;
 
 	const size = value ? value.length + 1 : 0;
-
-	// Is this our first render? Take the value and find out if it should be. If no value, A11Y concerns will not exist so false is okay.
-	const [ isInitialRender, setIsInitialRender ] = useState(
-		value ? true : false
-	);
-	useEffect( () => {
-		// If initial render is set to true but the user just placed focus on the input, now focus can be allowed.
-		if ( isInitialRender && inputHasFocus ) {
-			setIsInitialRender( false );
-		}
-	}, [ inputHasFocus ] );
 
 	const onChangeHandler = ( event: ChangeEvent< HTMLInputElement > ) => {
 		if ( onChange ) {
@@ -69,12 +58,12 @@ export function UnForwardedTokenInput(
 			aria-expanded={ isExpanded }
 			aria-autocomplete="list"
 			aria-owns={
-				isExpanded
+				! isComboboxControl && isExpanded
 					? `components-form-token-suggestions-${ instanceId }`
 					: undefined
 			}
 			aria-activedescendant={
-				! isInitialRender && selectedSuggestionIndex !== -1
+				! isComboboxControl && selectedSuggestionIndex !== -1
 					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
 					: undefined
 			}

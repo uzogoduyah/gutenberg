@@ -69,7 +69,7 @@ function ComboboxControl( {
 	} );
 
 	const currentOption = options.find( ( option ) => option.value === value );
-	const currentLabel = currentOption?.label ?? '';
+	const currentLabel = currentOption?.label;
 	// Use a custom prefix when generating the `instanceId` to avoid having
 	// duplicate input IDs when rendering this component and `FormTokenField`
 	// in the same page (see https://github.com/WordPress/gutenberg/issues/42112).
@@ -81,6 +81,7 @@ function ComboboxControl( {
 	const [ inputHasFocus, setInputHasFocus ] = useState( false );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const inputContainer = useRef();
+	const changingLabel = selectedSuggestion?.label || inputValue;
 
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
@@ -235,8 +236,8 @@ function ComboboxControl( {
 			>
 				<div
 					className="components-combobox-control__suggestions-container"
-					tabIndex="-1"
 					onKeyDown={ onKeyDown }
+					tabIndex="-1"
 				>
 					<InputWrapperFlex
 						__next36pxDefaultSize={ __next36pxDefaultSize }
@@ -246,13 +247,9 @@ function ComboboxControl( {
 								className="components-combobox-control__input"
 								instanceId={ instanceId }
 								ref={ inputContainer }
-								value={ isExpanded ? inputValue : currentLabel }
-								aria-label={
-									currentLabel
-										? `${ currentLabel }, ${ label }`
-										: null
+								value={
+									isExpanded ? changingLabel : currentLabel
 								}
-								inputHasFocus={ inputHasFocus }
 								onFocus={ onFocus }
 								onBlur={ onBlur }
 								isExpanded={ isExpanded }
@@ -260,6 +257,7 @@ function ComboboxControl( {
 									selectedSuggestion
 								) }
 								onChange={ onInputChange }
+								isComboboxControl={ true }
 							/>
 						</FlexBlock>
 						{ allowReset && (
