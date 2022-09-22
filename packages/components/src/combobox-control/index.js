@@ -69,7 +69,7 @@ function ComboboxControl( {
 	} );
 
 	const currentOption = options.find( ( option ) => option.value === value );
-	const currentLabel = currentOption?.label;
+	const currentLabel = currentOption?.label ?? undefined;
 	// Use a custom prefix when generating the `instanceId` to avoid having
 	// duplicate input IDs when rendering this component and `FormTokenField`
 	// in the same page (see https://github.com/WordPress/gutenberg/issues/42112).
@@ -236,8 +236,8 @@ function ComboboxControl( {
 			>
 				<div
 					className="components-combobox-control__suggestions-container"
-					onKeyDown={ onKeyDown }
 					tabIndex="-1"
+					onKeyDown={ onKeyDown }
 				>
 					<InputWrapperFlex
 						__next36pxDefaultSize={ __next36pxDefaultSize }
