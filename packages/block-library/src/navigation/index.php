@@ -417,12 +417,13 @@ function block_core_navigation_get_fallback_blocks() {
 
 	$navigation_post = block_core_navigation_get_most_recently_published_navigation();
 
-	// If there are no navigation posts then try to find a classic menu.
+	// If there are no navigation posts then try to find a classic menu
+	// and convert it into a block based navigation menu.
 	if ( ! $navigation_post ) {
 		$navigation_post = block_core_navigation_maybe_use_classic_menu_fallback();
 	}
 
-	// Prefer using the first non-empty Navigation as fallback if available.
+	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
 		$maybe_fallback = block_core_navigation_filter_out_empty_blocks( parse_blocks( $navigation_post->post_content ) );
 
