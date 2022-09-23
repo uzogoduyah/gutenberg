@@ -85,12 +85,13 @@ dependencies {
     implementation "org.wordpress-mobile:react-native-clipboard:${extractPackageVersion(packageJson, '@react-native-clipboard/clipboard', 'dependencies')}"
     implementation "org.wordpress-mobile:react-native-fast-image:${extractPackageVersion(packageJson, 'react-native-fast-image', 'dependencies')}"
 
-    implementation("com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}", {
+    // implementation("com.github.wordpress-mobile:react-native-gesture-handler:${extractPackageVersion(packageJson, 'react-native-gesture-handler', 'dependencies')}", {
+    implementation("com.github.wordpress-mobile:react-native-gesture-handler:wp-fork-2.3.2-wp-2-SNAPSHOT", {
         // Remove Reanimated transitive dependency as it's already defined here
         exclude group: 'com.github.wordpress-mobile', module: 'react-native-reanimated'
     })
 
-    implementation("com.facebook.react:hermes-engine:$rnVersion", {
+    runtimeOnly("com.facebook.react:hermes-engine:$rnVersion", {
         exclude group:'com.facebook.fbjni'
     })
 
