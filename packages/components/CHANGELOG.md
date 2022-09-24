@@ -6,6 +6,7 @@
 
 -   `Popover`: fix limitShift logic by adding iframe offset correctly [#42950](https://github.com/WordPress/gutenberg/pull/42950)).
 -   `Popover`: refine position-to-placement conversion logic, add tests ([#44377](https://github.com/WordPress/gutenberg/pull/44377)).
+-   `NavigatorScreen`: fix focus issue where back button received focus unexpectedly ([#44239](https://github.com/WordPress/gutenberg/pull/44239))
 
 ### Internal
 
